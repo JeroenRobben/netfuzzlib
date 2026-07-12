@@ -33,8 +33,7 @@ static int populate_ifaddrs_with_address(struct ifaddrs *my_ifaddrs, const nfl_l
         return -1;
     }
 
-    strncpy(name, iface_l3->parent_l2_iface->name, IF_NAMESIZE);
-    name[IF_NAMESIZE] = '\0';
+    snprintf(name, IF_NAMESIZE + 1, "%s", iface_l3->parent_l2_iface->name);
     my_ifaddrs->ifa_name = name;
     my_ifaddrs->ifa_flags = iface_l3->parent_l2_iface->flags;
 
@@ -112,8 +111,7 @@ static struct ifaddrs *populate_packet_ifaddrs(const nfl_l2_iface_t *iface_l2) {
         free(my_ifaddrs);
         return NULL;
     }
-    strncpy(name, iface_l2->name, IF_NAMESIZE);
-    name[IF_NAMESIZE] = '\0';
+    snprintf(name, IF_NAMESIZE + 1, "%s", iface_l2->name);
 
     ll->sll_family = AF_PACKET;
     ll->sll_ifindex = (int)iface_l2->index;
