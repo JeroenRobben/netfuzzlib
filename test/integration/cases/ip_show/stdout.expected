@@ -1,0 +1,9 @@
+# ip link / ip addr / ip route — exercise the netlink RTM_GETLINK / GETADDR /
+# GETROUTE paths through iproute2's NETLINK_GET_STRICT_CHK-aware client.
+^1: lo:.*LOOPBACK
+^2: eth0:.*BROADCAST
+inet 127\.0\.0\.1/8
+inet6 ::1/128
+inet 192\.0\.2\.1/24
+^127\.0\.0\.0/8 dev lo
+^192\.0\.2\.0/24 dev eth0

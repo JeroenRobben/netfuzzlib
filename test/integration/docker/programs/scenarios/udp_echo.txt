@@ -1,0 +1,4 @@
+# udp_echo: model delivers one datagram, expects an identical echo back.
+# Payload "hello" (5 bytes).
+deliver to=127.0.0.1:8888 from=192.0.2.55:54321 hex=68656c6c6f
+expect  from=127.0.0.1:8888 to=192.0.2.55:54321   hex=68656c6c6f

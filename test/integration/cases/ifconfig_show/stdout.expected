@@ -1,0 +1,11 @@
+# Each non-blank line is an extended regex; the SUT's stdout must contain a
+# match for every one. The scripted module configures eth0 = 192.0.2.1/24,
+# and the environment auto-adds lo = 127.0.0.1/8. ifconfig should report
+# both — the loopback flags vary by version (some show LOOPBACK in the
+# bracketed flag list, some in the verbose line) so we anchor on the
+# address-family lines instead.
+^lo:.*flags=
+inet 127\.0\.0\.1
+^eth0:.*flags=
+inet 192\.0\.2\.1
+ether 02:00:00:00:00:01

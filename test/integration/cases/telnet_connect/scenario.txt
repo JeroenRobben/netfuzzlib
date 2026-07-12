@@ -1,0 +1,5 @@
+# telnet 192.0.2.2 23 — verify outbound TCP connect works under nfl.
+# scripted module accepts the connect; drain_sends absorbs any IAC option
+# negotiation bytes telnet sends before stdin EOFs and the session ends.
+tcp_connect to=192.0.2.2:23
+drain_sends 100

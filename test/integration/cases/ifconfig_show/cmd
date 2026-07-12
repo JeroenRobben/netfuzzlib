@@ -1,0 +1,1 @@
+env LD_PRELOAD=$NFL_LD_PRELOAD ifconfig lo && env LD_PRELOAD=$NFL_LD_PRELOAD ifconfig eth0

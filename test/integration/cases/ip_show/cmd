@@ -1,0 +1,3 @@
+env LD_PRELOAD=$NFL_LD_PRELOAD ip link show && \
+env LD_PRELOAD=$NFL_LD_PRELOAD ip addr show && \
+env LD_PRELOAD=$NFL_LD_PRELOAD ip route show

@@ -1,0 +1,26 @@
+---
+Checks: >
+  bugprone-*,
+  cert-*,
+  clang-analyzer-*,
+  misc-*,
+  modernize-*,
+  performance-*,
+  portability-*,
+  readability-*,
+  -misc-include-cleaner,
+  -misc-no-recursion,
+  -bugprone-easily-swappable-parameters,
+  -readability-identifier-length,
+  -readability-magic-numbers,
+  -readability-implicit-bool-conversion,
+  -cert-err33-c,
+  -readability-inconsistent-declaration-parameter-name,
+  -clang-analyzer-security.insecureAPI.DeprecatedOrUnsafeBufferHandling,
+  -clang-analyzer-security.VAList,
+  -bugprone-reserved-identifier,
+  -cert-dcl37-c,
+  -cert-dcl51-cpp
+WarningsAsErrors: '*'
+HeaderFilterRegex: '(src|include|modules)/.*\.h$'
+FormatStyle: file
