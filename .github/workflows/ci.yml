@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+# Cancel superseded runs on the same branch/PR.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    name: ${{ matrix.compiler }} / ${{ matrix.config }}
+    runs-on: ubuntu-24.04
+
+    strategy:
+      fail-fast: false
+      matrix:
+        compiler: [gcc, clang]
+        config: [Debug, Release, ASan]
+        include:
+          - compiler: gcc
+            cc: gcc-13
+            cxx: g++-13
+          - compiler: clang
+            cc: clang-18
+            cxx: clang++-18
+
+    env:
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+      # tests_nfl spams INFO at startup unless we silence it.
+      NFL_LOG_LEVEL: fatal
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install build deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            cmake ninja-build pkg-config \
+            ${{ matrix.cc }} ${{ matrix.cxx }} \
+            libgtest-dev libgmock-dev \
+            libevent-dev libev-dev libuv1-dev \
+            netcat-openbsd net-tools inetutils-telnet iproute2
+
+      - name: Configure
+        run: |
+          case "${{ matrix.config }}" in
+            Debug)   FLAGS="-DCMAKE_BUILD_TYPE=Debug" ;;
+            Release) FLAGS="-DCMAKE_BUILD_TYPE=Release" ;;
+            ASan)    FLAGS="-DCMAKE_BUILD_TYPE=Debug -DNFL_ASAN=ON" ;;
+          esac
+          cmake -S . -B build -G Ninja $FLAGS
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        working-directory: build
+        # `docker` label excludes the Docker-based integration tests —
+        # those build real protocol daemons + scripted-module SUTs inside
+        # containers and are too expensive for the per-PR matrix. They
+        # run on a separate cron schedule via integration-docker.yml.
+        run: ctest --output-on-failure --parallel -LE docker

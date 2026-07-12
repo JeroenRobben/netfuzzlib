@@ -1,5 +1,6 @@
 #ifndef NETFUZZLIB_TYPES_H
 #define NETFUZZLIB_TYPES_H
+#include <stddef.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <linux/netlink.h>
@@ -11,22 +12,24 @@ typedef union {
     struct sockaddr_nl nl;
 } nfl_addr_t;
 
-/**
- * A network packet
- */
 typedef struct nfl_pkt {
-    struct iovec iov; // Iovec structure representing the contents of this packet.
-
-    unsigned int device_index; // The index of the device by which this packet was received. Ignored for TCP packets.
-    nfl_addr_t local_addr; // The receiver address of this packet, e.g. 255.255.255.255. Ignored for TCP packets.
-    nfl_addr_t remote_addr; // The sender address of this packet, e.g. 255.255.255.255. Ignored for TCP packets.
-    struct nfl_pkt *next;
+    void *buf;
+    size_t len;
 } nfl_pkt;
 
-typedef struct nfl_sock_module_t {
-    int domain; // Network domain of the socket, AF_INET | AF_INET6
-    int type; // Socket type, SOCK_DGRAM | SOCK_STREAM | SOCK_RAW
-    int protocol; // Socket protocol, IPPROTO_UDP | IPPROTO_TCP | IPPROTO_ICMP | IPPROTO_ICMPV6
-} nfl_sock_module_t;
+//You only need to fill this in for UDP packets. dst_addr and iface_index are optional.
+typedef struct nfl_recv_info {
+    nfl_addr_t src_addr;      // Sender address/port
+    nfl_addr_t dst_addr;      // Destination address/port. You only need to fill this in for targets that use IP_PKTINFO, e.g. to know the destination IP of a packet received on a socket bound to 0.0.0.0.
+    unsigned int iface_index; // Receiving interface index. You only need to fill this in for targets that use IP_PKTINFO, e.g. to know which interface a packet was received on. Use the same interface indexing as given by ip addr.
+} nfl_recv_info;
 
-#endif //NETFUZZLIB_TYPES_H
+typedef struct nfl_sock_t {
+    int domain;   // Network domain, AF_INET or AF_INET6.
+    int type;     // Socket type, SOCK_DGRAM, SOCK_STREAM or SOCK_RAW.
+    int protocol; // Protocol, IPPROTO_UDP, IPPROTO_TCP, IPPROTO_ICMP or IPPROTO_ICMPV6.
+    const nfl_addr_t *local_addr;  // Local endpoint, NULL if unbound.
+    const nfl_addr_t *remote_addr; // Connected peer, NULL if not connected.
+} nfl_sock_t;
+
+#endif // NETFUZZLIB_TYPES_H

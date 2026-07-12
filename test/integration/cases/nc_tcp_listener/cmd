@@ -1,0 +1,1 @@
+printf hello | env LD_PRELOAD=$NFL_LD_PRELOAD nc -l -q 0 127.0.0.1 8080

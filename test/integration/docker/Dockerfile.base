@@ -1,0 +1,63 @@
+# Base image for the docker-isolated integration tests.
+#
+# Deliberately does NOT compile netfuzzlib. The libraries
+# (libnfl.so, libmodule-bridge-kernel.so, libmodule-test-scripted.so)
+# are bind-mounted from the host's CMake build dir at run time. See
+# run-target.sh. This means a source-only edit (typical iteration loop)
+# requires `cmake --build` on the host but no Docker rebuild, dropping
+# warm-cache integration runs from ~30 s to ~5 s per target.
+#
+# Trade-off: the image needs the libs mounted to be useful. A bare
+# `docker run` without the volume will fail-fast at LD_PRELOAD time
+# rather than silently using stale baked-in libs.
+#
+# Per-target Dockerfiles `FROM netfuzzlib-base` and add their daemon.
+# Build with: docker build -f test/integration/docker/Dockerfile.base -t netfuzzlib-base .
+
+FROM ubuntu:24.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        # toolchain: kept for per-target Dockerfiles that compile
+        # daemons from source (lightftp, tinydtls). NOT used for
+        # netfuzzlib itself anymore. That's built on the host.
+        build-essential \
+        git \
+        ca-certificates \
+        # libc the bridge module + tests link against
+        libc6-dev \
+        # debug tools: always present, never strip these from the image.
+        # ~50 MB and save hours during a 3 a.m. debugging session.
+        strace \
+        ltrace \
+        gdb \
+        lsof \
+        tcpdump \
+        netcat-openbsd \
+        curl \
+        iproute2 \
+        procps \
+        psmisc \
+        less \
+        vim-tiny \
+        file \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY test/integration/docker/nfl-entrypoint.sh /opt/nfl/bin/nfl-entrypoint
+RUN chmod +x /opt/nfl/bin/nfl-entrypoint
+
+# Logs land here. Mount this as a volume in CI / dev to capture artifacts
+# even when the container exits.
+RUN mkdir -p /var/log/nfl /opt/nfl/lib
+ENV NFL_LOG_DIR=/var/log/nfl
+
+# The libnfl + module .so files live here at run time, bind-mounted
+# from the host's CMake lib output via run-target.sh's `-v` flag. This
+# directory is empty in the image itself.
+ENV NFL_LIB_DIR=/opt/nfl/lib
+
+# Default to a help banner so a misconfigured `docker run` doesn't silently
+# block on a hung daemon. Per-target images override CMD/ENTRYPOINT.
+ENTRYPOINT ["/opt/nfl/bin/nfl-entrypoint"]
+CMD ["help"]

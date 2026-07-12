@@ -1,0 +1,1 @@
+env LD_PRELOAD=$NFL_LD_PRELOAD nc -u -l -W 1 127.0.0.1 9999

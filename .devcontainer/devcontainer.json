@@ -1,0 +1,29 @@
+{
+    "name": "netfuzzlib",
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "features": {
+        "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {},
+        "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+    },
+    "remoteUser": "vscode",
+    "mounts": [
+        "source=netfuzzlib-claude-config-${devcontainerId},target=/home/vscode/.claude,type=volume"
+    ],
+    "containerEnv": {
+        "NFL_LOG_LEVEL": "fatal"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "anthropic.claude-code"
+            ]
+        },
+        "jetbrains": {
+            "backend": "CLion"
+        }
+    }
+}

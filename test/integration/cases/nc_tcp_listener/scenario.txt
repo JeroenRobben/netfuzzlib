@@ -1,0 +1,7 @@
+# printf hello | nc -l -q 0 127.0.0.1 8080
+# nc listens, accepts (scripted tcp_accept feeds the peer addr), reads
+# "hello" from stdin and writes it to the network. -q 0 makes nc close
+# immediately after stdin EOF, so we don't need to drive an inbound packet
+# to convince it to exit.
+tcp_accept on=127.0.0.1:8080 from=10.0.0.1:1234
+expect     from=127.0.0.1:8080 to=10.0.0.1:1234 hex=68656c6c6f

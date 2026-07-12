@@ -1,0 +1,33 @@
+---
+# Style for netfuzzlib. Matches the inline style used by clang-tidy --fix runs.
+Language: Cpp
+BasedOnStyle: LLVM
+
+# Indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+ContinuationIndentWidth: 4
+IndentCaseLabels: false
+AccessModifierOffset: -4
+
+# Line breaking
+ColumnLimit: 0
+BreakBeforeBraces: Attach
+AllowShortBlocksOnASingleLine: Empty
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+AllowShortCaseLabelsOnASingleLine: false
+
+# Pointers / references
+PointerAlignment: Right
+
+# Misc
+SortIncludes: false
+Cpp11BracedListStyle: false
+SpacesInContainerLiterals: true
+SpaceBeforeParens: ControlStatements
+KeepEmptyLinesAtTheStartOfBlocks: false
+MaxEmptyLinesToKeep: 1
+ReflowComments: IndentOnly

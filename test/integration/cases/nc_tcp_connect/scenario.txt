@@ -1,0 +1,7 @@
+# printf hello | nc -s 127.0.0.1 -p 12345 -w 1 127.0.0.1 8080
+# nc connects (scripted tcp_connect accepts), reads "hello" from stdin and
+# sends it. -s/-p pin the source addr so the expect's `from` is exact (the
+# stream-send path uses addr_eq, not the wildcard match the receive side
+# uses); -w 1 caps post-send wait so the test exits promptly.
+tcp_connect to=127.0.0.1:8080
+expect      from=127.0.0.1:12345 to=127.0.0.1:8080 hex=68656c6c6f
